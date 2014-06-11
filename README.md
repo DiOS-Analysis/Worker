@@ -42,7 +42,7 @@ apt-get install libimobiledevice-utils ideviceinstaller
 
 ## Running the Worker
 
-./worker.py -b http://`hostname.local`/
+`./worker.py -b http://<hostname>.local/`
 
 
 ## Additional scripts
