@@ -49,6 +49,7 @@ class DeviceLoop(Process):
 				#logger.info("Waiting for device restart (3 minutes)")
 				#time.sleep(3*60)
 				self.stop()
+				break
 			
 			jobDict = self.backend.get_job_for_device(self.device.uuid)
 
