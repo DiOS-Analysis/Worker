@@ -18,7 +18,7 @@ from device import iDevice
 from backend import Backend
 #from pilot import Pilot
 
-MIN_FREE_DEVICE_BYTES = 2*1024**3
+MIN_FREE_DEVICE_BYTES = 1024**3
 
 class DeviceLoop(Process):
 
