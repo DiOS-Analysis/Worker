@@ -97,7 +97,7 @@ class Backend(object):
 		if r.status_code == 200:
 			return json.loads(r.text)
 		else:
-			return None
+			return {}
 
 	def post_account(self, account):
 		logger.debug("post_account")
