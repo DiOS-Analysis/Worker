@@ -39,7 +39,7 @@ class iDevice(object):
 
 	@staticmethod
 	def list_device_ids():
-		''' list of the connected devices uuid's
+		''' list of the connected devices udid's
 		'''
 		output = subprocess.check_output(["idevice_id", "--list"])
 		return filter(None, output.split("\n"));
@@ -48,26 +48,26 @@ class iDevice(object):
 	def devices(cls):
 		''' list of connected devices.
 		'''
-		return list(iDevice(uuid) for uuid in iDevice.list_device_ids())
+		return list(iDevice(udid) for udid in iDevice.list_device_ids())
 
-	def __init__(self, uuid):
-		self.uuid = uuid
+	def __init__(self, udid):
+		self.udid = udid
 		self.deviceDict = {}
 		self.accountDict = {}
 		self.locale_val = ""
 
 
 	def __str__(self):
-		return "<iDevice: %s>" % self.uuid
+		return "<iDevice: %s>" % self.udid
 
 	def __repr__(self):
-		return "<iDevice: %s>" % self.uuid
+		return "<iDevice: %s>" % self.udid
 
 	def device_info_dict(self):
 		''' raw device information as dict
 		'''
 		if (len(self.deviceDict) == 0):
-			output = subprocess.check_output(["ideviceinfo", "--xml", "--udid", self.uuid])
+			output = subprocess.check_output(["ideviceinfo", "--xml", "--udid", self.udid])
 			self.deviceDict = plistlib.readPlistFromString(output)
 		return self.deviceDict
 
@@ -78,7 +78,7 @@ class iDevice(object):
 		''' the devices locale setting
 		'''
 		if (self.locale_val == ""):
-			self.locale_val = subprocess.check_output(["ideviceinfo", "--udid", self.uuid, "--domain", "com.apple.international", "--key", "Locale"]).strip()
+			self.locale_val = subprocess.check_output(["ideviceinfo", "--udid", self.udid, "--domain", "com.apple.international", "--key", "Locale"]).strip()
 		return self.locale_val
 
 
@@ -87,7 +87,7 @@ class iDevice(object):
 		'''
 		baseUrl = None
 		device_handler = deviceconnection.shared_device_handler()
-		conn_tuple = device_handler.device_connection_info(self.uuid)
+		conn_tuple = device_handler.device_connection_info(self.udid)
 		if conn_tuple:
 			baseUrl = "http://%s:%s/" % conn_tuple
 		return baseUrl
@@ -97,7 +97,7 @@ class iDevice(object):
 	def free_bytes(self):
 		''' get the free space left on the device in bytes
 		'''
-		output = subprocess.check_output(["ideviceinfo", "--udid", self.uuid, "--domain", "com.apple.disk_usage", "--key", "TotalDataAvailable"])
+		output = subprocess.check_output(["ideviceinfo", "--udid", self.udid, "--domain", "com.apple.disk_usage", "--key", "TotalDataAvailable"])
 		free_bytes = 0
 		try:
 			free_bytes = long(output)
@@ -111,7 +111,7 @@ class iDevice(object):
 		''' get raw account info from device as dict.
 		'''
 		if (len(self.accountDict) == 0):
-			output = subprocess.check_output(["ideviceinfo", "--xml", "--udid", self.uuid, "--domain", "com.apple.mobile.iTunes.store", "--key", "KnownAccounts"])
+			output = subprocess.check_output(["ideviceinfo", "--xml", "--udid", self.udid, "--domain", "com.apple.mobile.iTunes.store", "--key", "KnownAccounts"])
 			if len(output) > 0:
 				self.accountDict = plistlib.readPlistFromString(output)
 			else:
@@ -163,7 +163,7 @@ class iDevice(object):
 	def installed_apps(self):
 		''' list all installed apps as dict.
 		'''
-		output = subprocess.check_output(["ideviceinstaller", "--udid", self.uuid, "--list-apps", "-o", "list_user", "-o", "xml"])
+		output = subprocess.check_output(["ideviceinstaller", "--udid", self.udid, "--list-apps", "-o", "list_user", "-o", "xml"])
 		if (len(output)==0):
 			return {}
 			
@@ -173,7 +173,7 @@ class iDevice(object):
 			plist = plistlib.readPlistFromString(output)
 		except Exception:
 			logger.warning("Failed to parse installed apps via xml output. Try to extract data via regex.")
-			output = subprocess.check_output(["ideviceinstaller", "--udid", self.uuid, "--list-apps", "-o", "list_user"])
+			output = subprocess.check_output(["ideviceinstaller", "--udid", self.udid, "--list-apps", "-o", "list_user"])
 			regex = re.compile("^(?P<bundleId>.*) - (?P<name>.*) (?P<version>(\d+\.*)+)$",re.MULTILINE)
 			# r = regex.search(output)
 			for i in regex.finditer(output):
@@ -216,7 +216,7 @@ class iDevice(object):
 		'''
 		result=True
 		try:
-			output = subprocess.check_output(["ideviceinstaller", "--udid", self.uuid, "--install", app_archive_path])
+			output = subprocess.check_output(["ideviceinstaller", "--udid", self.udid, "--install", app_archive_path])
 			logger.debug('output: %s' % output)
 			if (len(output)==0):
 				result=False
@@ -231,7 +231,7 @@ class iDevice(object):
 		'''
 		result=True
 		try:
-			output = subprocess.check_output(["ideviceinstaller", "--udid", self.uuid, "--uninstall", bundleId])
+			output = subprocess.check_output(["ideviceinstaller", "--udid", self.udid, "--uninstall", bundleId])
 			logger.debug('output: %s' % output)
 			if (len(output)==0):
 				result=False
@@ -244,7 +244,7 @@ class iDevice(object):
 		''' archives an app to `app_archive_folder`
 			returns True or False
 		'''
-		options = ["ideviceinstaller", "--udid", self.uuid, "--archive", bundleId, "-o", "copy="+app_archive_folder, "-o", "remove"]
+		options = ["ideviceinstaller", "--udid", self.udid, "--archive", bundleId, "-o", "copy="+app_archive_folder, "-o", "remove"]
 		if app_only:
 			options.extend(["-o", "app_only"])
 		if uninstall:

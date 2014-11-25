@@ -51,7 +51,7 @@ class DeviceLoop(Process):
 				self.stop()
 				break
 			
-			jobDict = self.backend.get_job_for_device(self.device.uuid)
+			jobDict = self.backend.get_job_for_device(self.device.udid)
 
 			if jobDict:
 				job = JobFactory.job_from_dict(jobDict, self.backend, self.device)
@@ -106,34 +106,34 @@ class Worker(Process):
 
 		while not self.stopped():
 			devices = iDevice.devices()
-			currDeviceUUIDs = []
+			currDeviceUDIDs = []
 			# search for new devices
 			for device in devices:
-				currDeviceUUIDs.append(device.uuid)
-				if device.uuid not in deviceLoops:
+				currDeviceUDIDs.append(device.udid)
+				if device.udid not in deviceLoops:
 					dLoop = DeviceLoop(device, self.backend)
 					dLoop.start()
-					deviceLoops[device.uuid] = dLoop
-					logger.info('Started device loop for %s', device.uuid)
+					deviceLoops[device.udid] = dLoop
+					logger.info('Started device loop for %s', device.udid)
 
 			# cleanup finished processes
-			for uuid in deviceLoops.keys():
-				if uuid not in currDeviceUUIDs:
-					dLoop = deviceLoops[uuid]
+			for udid in deviceLoops.keys():
+				if udid not in currDeviceUDIDs:
+					dLoop = deviceLoops[udid]
 					if dLoop.is_alive():
 						dLoop.stop()
-						logger.info('Waiting for DeviceLoop to stop... (%s)', uuid)
+						logger.info('Waiting for DeviceLoop to stop... (%s)', udid)
 						dLoop.join(10)
 						if dLoop.is_alive():
-							logger.info('... loop has not yet stopped. Terminating the loop now.  (%s)', uuid)
+							logger.info('... loop has not yet stopped. Terminating the loop now.  (%s)', udid)
 							dLoop.terminate()
-					deviceLoops.pop(uuid)
-					logger.info('Device loop finished: %s', uuid)
+					deviceLoops.pop(udid)
+					logger.info('Device loop finished: %s', udid)
 			time.sleep(5)
 
 		logger.info('runloop is shutting down. Stoping all client processes gracefully')
-		for uuid, process in deviceLoops:
-			logger.info('joining device loop for device %s', uuid)
+		for udid, process in deviceLoops:
+			logger.info('joining device loop for device %s', udid)
 			process.join()
 		logger.info('Worker has finished working...')
 

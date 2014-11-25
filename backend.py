@@ -48,11 +48,11 @@ class Backend(object):
 	# get device data and check/register with backend
 	def register_device(self, device):
 		logger.debug("register_device: %s", device)
-		r = requests.get("%s/devices/%s" % (self.baseUrl, device.uuid))
+		r = requests.get("%s/devices/%s" % (self.baseUrl, device.udid))
 		if (r.status_code == 404):
 			self.register_device_accounts(device)
 			r2 = requests.post("%s/devices" % self.baseUrl, headers=self.HEADERS, data=jd({
-				'uuid': device.uuid,
+				'udid': device.udid,
 				'accounts': list(str(acc['uniqueIdentifier']) for acc in device.accounts()),
 				'deviceInfo': device.device_info_dict()
 			}))
@@ -148,7 +148,7 @@ class Backend(object):
 
 	# returns appId
 	def post_app(self, appData):
-		logger.debug("post_aoo: %s", appData)
+		logger.debug("post_app: %s", appData)
 		r = requests.post("%s/apps" % self.baseUrl, data=jd(appData), headers=self.HEADERS)
 		if r.status_code == 200:
 			return json.loads(r.text)['appId']
