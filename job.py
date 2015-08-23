@@ -45,7 +45,7 @@ class InstallAppJob(Job):
 		logger.debug('archiving %s' % bundleId)
 		try:
 			### add app binary to backend
-			self.device.archive(bundleId, self.APP_ARCHIVE_PATH, app_only=True, uninstall=False)
+			self.device.archive(bundleId, self.APP_ARCHIVE_PATH, app_only=True)
 			appPath = '%s%s.ipa' % (self.APP_ARCHIVE_PATH, bundleId)
 			logger.debug('archiving app %s to %s' % (bundleId, appPath))
 			self.backend.post_app_archive(self.appId, appPath)
@@ -300,7 +300,7 @@ class RunAppJob(Job):
 		logger.debug('archiving %s' % bundleId)
 		try:
 			### add app binary to backend
-			self.device.archive(bundleId, self.APP_ARCHIVE_PATH, app_only=True, uninstall=False)
+			self.device.archive(bundleId, self.APP_ARCHIVE_PATH, app_only=True)
 			appPath = '%s%s.ipa' % (self.APP_ARCHIVE_PATH, bundleId)
 			logger.debug('archiving app %s to %s' % (bundleId, appPath))
 			self.backend.post_app_archive(self.appId, appPath)
@@ -323,7 +323,7 @@ class RunAppJob(Job):
 
 	def _save_run_results(self, runId, bundleId, uninstallApp=True):
 		logger.info("Saving apparchive to backend")
-		if self.device.archive(bundleId, self.APP_ARCHIVE_PATH, app_only=False, uninstall=uninstallApp):
+		if self.device.archive(bundleId, self.APP_ARCHIVE_PATH, app_only=False):
 			appPath = self.APP_ARCHIVE_PATH + bundleId + '.ipa'
 			if os.path.exists(appPath):
 				f = open(appPath, 'rb')
@@ -337,6 +337,9 @@ class RunAppJob(Job):
 
 				#delete app archive from disk
 				os.remove(appPath)
+		
+		if uninstallApp:
+			self.device.uninstall(bundleId)
 
 
 

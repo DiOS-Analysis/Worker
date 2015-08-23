@@ -240,15 +240,13 @@ class iDevice(object):
 			result=False
 		return result
 
-	def archive(self, bundleId, app_archive_folder, app_only=True, uninstall=True):
+	def archive(self, bundleId, app_archive_folder, app_only=True):
 		''' archives an app to `app_archive_folder`
 			returns True or False
 		'''
 		options = ["ideviceinstaller", "--udid", self.udid, "--archive", bundleId, "-o", "copy="+app_archive_folder, "-o", "remove"]
 		if app_only:
 			options.extend(["-o", "app_only"])
-		if uninstall:
-			options.extend(["-o", "uninstall"])
 
 		if not os.path.exists(app_archive_folder):
 			os.makedirs(app_archive_folder)
