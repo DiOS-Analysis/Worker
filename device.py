@@ -73,6 +73,11 @@ class iDevice(object):
 
 	DEVICE_INFO = Enum(['DeviceName', 'DeviceClass', 'ProductType', 'ProductVersion', 'WiFiAddress'])
 
+	def ios_version(self):
+		''' the devices iOS verison
+		'''
+		version = self.device_info_dict()["ProductVersion"]
+		return tuple(map(int, (version.split("."))))
 
 	def locale(self):
 		''' the devices locale setting

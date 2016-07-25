@@ -245,9 +245,12 @@ class InstallAppJob(Job):
 			jobInfo = self.jobDict['jobInfo']
 			bundleId = jobInfo['bundleId']
 	
-			logger.debug("check if backend already has an app ipa")
-			if not self.backend.has_app_archive(self.appId):
-				self._archive_app_binary(bundleId)
+			if self.device.ios_version()[0] > 8:
+				logger.debug("skipping app archiving since device is running iOS 9 or later")
+			else:
+				logger.debug("check if backend already has an app ipa")
+				if not self.backend.has_app_archive(self.appId):
+					self._archive_app_binary(bundleId)
 			
 			backendJobData['state'] = Job.STATE.FINISHED
 	
@@ -362,8 +365,11 @@ class RunAppJob(Job):
 			jobInfo = self.jobDict['jobInfo']
 			bundleId = jobInfo['bundleId']
 
-			if not self.backend.has_app_archive(self.appId):
-				self._archive_app_binary(bundleId)
+			if self.device.ios_version()[0] > 8:
+				logger.debug("skipping app archiving since device is running iOS 9 or later")
+			else:
+				if not self.backend.has_app_archive(self.appId):
+					self._archive_app_binary(bundleId)
 
 			executionStrategy = None
 			if 'executionStrategy' in jobInfo:
