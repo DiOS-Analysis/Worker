@@ -24,7 +24,7 @@ Almost all tools should be available via common package managers (e.g., apt on L
 BeatifulSoup 4 is probably not available via apt and needs to be installed via `pip` or manually.
 
 ```
-pip install beautifulsoup4 requests argparse plist
+pip install beautifulsoup4 requests argparse plists
 ```
 
 `libimobiledevice` is available via homebrew:
